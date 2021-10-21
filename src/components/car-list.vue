@@ -64,7 +64,9 @@
             <input type="checkbox" class="btn-check" id="motoToggle" v-model="filters.categories['motorcycles']">
             <label class="btn btn-outline-info" for="motoToggle">Motorcycles</label>
         </div>
-
+        <div v-if="loading" class="d-flex justify-content-center py-4">
+            <spinner type="primary"></spinner>
+        </div>
         <div class="d-flex flex-wrap justify-content-center w-100">
             <car class="m-2" v-for="car in filtered" :key="car.listdate.toString()" :car="car"></car>
         </div>
@@ -73,11 +75,13 @@
 
 <script>
 import car from './car.vue'
+import spinner from './loading-spinner.vue'
 export default {
     props: [],
     data: function() {
         return {
             cars: [],
+            loading: false,
             search: "",
             filters: {
                 categories: {
@@ -144,7 +148,8 @@ export default {
         }
     },
     components: {
-        car
+        car,
+        spinner,
     },
     methods: {
         formatCars : function() {
@@ -179,10 +184,14 @@ export default {
         }
     },
     mounted: function() {
+        this.loading = true;
         let _this = this;
         axios.get("https://stapi-proxy.alexr03.dev/v1/market/getlistings")
         .then(function(response) {
             _this.cars = response.data
+        }).finally(function() {
+            console.log("HELLO?")
+            _this.loading = false;
         })
     }
 
